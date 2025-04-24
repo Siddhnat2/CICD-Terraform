@@ -1,1 +1,32 @@
+name: Create GCP VM
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  create-vm:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup Google Cloud SDK
+      uses: google-github-actions/setup-gcloud@v2
+      with:
+        project_id: ${{ secrets.GCP_PROJECT_ID }}
+        service_account_key: ${{ secrets.GCP_SA_KEY }}
+        export_default_credentials: true
+
+    - name: Create VM instance
+      run: |
+        gcloud compute instances create github-action-vm \
+          --zone=us-central1-a \
+          --machine-type=e2-micro \
+          --image-family=debian-11 \
+          --image-project=debian-cloud \
+          --tags=http-server \
+          --boot-disk-size=10GB
 
